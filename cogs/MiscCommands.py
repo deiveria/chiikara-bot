@@ -3,7 +3,7 @@ from discord.ext import commands
 
 
 """
-Legenda:
+Legenda para os comandos:
 [] = Variável do código
 {} = Argumento do comando
 
@@ -54,7 +54,10 @@ class MiscCommands(commands.Cog, name='Diversos'):
     @commands.command(name='avatar')
     @commands.guild_only()
     async def avatar(self, ctx, member: discord.Member):
-        await ctx.send(member.avatar_url_as(format='png', static_format='webp', size=2048))
+        avatar_link = member.avatar_url_as(format='png', static_format='webp', size=2048)
+        avatar_embed = discord.Embed(title=f"Avatar - {member.name}#{member.discriminator}", colour=0xEE4D4D)
+        avatar_embed.set_image(url=avatar_link)
+        await ctx.send(embed=avatar_embed)
 
     @avatar.error
     async def avatar_error(self, ctx, error):
