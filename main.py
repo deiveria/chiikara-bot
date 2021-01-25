@@ -1,9 +1,10 @@
 import discord
 import os
+import config
 from discord.ext import commands
 
 
-client = commands.Bot(command_prefix='.')
+client = commands.Bot(command_prefix=config.prefix)
 
 
 @client.command()
@@ -25,4 +26,4 @@ for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         client.load_extension(f'cogs.{filename[:-3]}')
 
-client.run('NjY3NTA3ODI0MzY4MDI1NjEw.XiDvGw.xOdCadANes0o9H_c-zRdXnosnS8')
+client.run(config.token)
