@@ -8,10 +8,9 @@ class AnimeCommands(commands.Cog, name='Anime e Mangá'):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command(name='anime')
     async def anime(self, ctx, *, anime_name):
-        await anilist.anime(anime_name)
+        await ctx.send(embed=anilist.anime(anime_name))
 
     @anime.error
     async def anime_error(self, ctx, error):
