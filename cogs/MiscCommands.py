@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.errors import MissingPermissions
 
 
 class MiscCommands(commands.Cog, name='Diversos'):
@@ -7,7 +8,7 @@ class MiscCommands(commands.Cog, name='Diversos'):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='falar', aliases=['diga', 'say', 'fala'])
+    @commands.command(name='falar', aliases=['diga', 'say', 'fala', 'fale'])
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     async def falar(self, ctx, channel: discord.TextChannel, *, arg):
@@ -19,8 +20,10 @@ class MiscCommands(commands.Cog, name='Diversos'):
             await ctx.send("Você não marcou nenhum canal.")
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("Você precisa mandar o canal e a mensagem a ser dita.")
+        if isinstance(error, commands.MissingPermissions):
+            return
 
-    @commands.command(name='avatar')
+    @commands.command(name='avatar', aliases=['foto', 'icon', 'pfp'])
     @commands.guild_only()
     async def avatar(self, ctx, member: discord.Member):
         avatar_link = member.avatar_url_as(
