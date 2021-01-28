@@ -4,33 +4,33 @@ import discord
 # Query para os dados sobre animes.
 ANIME_QUERY = '''
 query ($search: String) {
-    Media (search: $search, type: ANIME) {
-        id
-        title {
-            romaji
-            native
-        }
-        status
-        meanScore
-        episodes
-        nextAiringEpisode {
-            timeUntilAiring
-            airingAt
-            episode
-        }
-        season
-        seasonYear
-        isLicensed
-        externalLinks{
-            site
-            url
-        }
-        bannerImage
-        siteUrl
-        coverImage {
-            large
-        }
+  Media(search: $search, type: ANIME) {
+    id
+    title {
+      romaji
+      native
     }
+    status
+    meanScore
+    episodes
+    nextAiringEpisode {
+      timeUntilAiring
+      airingAt
+      episode
+    }
+    season
+    seasonYear
+    isLicensed
+    externalLinks {
+      site
+      url
+    }
+    bannerImage
+    siteUrl
+    coverImage {
+      large
+    }
+  }
 }
 '''
 
@@ -43,6 +43,8 @@ def get_url(data):
     return f"[Página no Anilist]({data['siteUrl']})"
 
 
+# Função responsável por "traduzir" o status da media e
+# retornar a cor desse status.
 def get_status(data):
     status = data['status']
     if status == "RELEASING":
@@ -58,16 +60,20 @@ def get_status(data):
 
 
 # O Embed aqui pode ser generalizado tanto para animes quanto para mangás.
-def get_base_embed(data):
+def create_base_embed(data):
     # Status do anime [Lançando, Finalizado, etc.]
     status = get_status(data)
     # Aqui é o corpo do embed
-    embed = discord.Embed(title=get_title(data), description=get_url(data), colour=status[1])
+    embed = discord.Embed(
+        title=get_title(data),
+        description=get_url(data),
+        colour=status[1]
+    )
     # A imagem do banner da página do anime pode ser nula,
     # caso o anime não tenha publicado nada
     banner_image = data["bannerImage"]
     # Só será colocado caso o valor não seja 'None'
-    if banner_image:    
+    if banner_image:
         embed.set_image(url=banner_image)
     # Inline faz os fields do Embed ficarem lado-a-lado,
     # porém há um limite de tamanho
@@ -81,18 +87,19 @@ def get_anime_data(name):
     # URL para o request
     url = 'https://graphql.anilist.co'
     # Dict dos dados do Anime
-    data = requests.post(url, json={'query': ANIME_QUERY, 'variables': variables}).json()
+    data = requests.post(
+        url, json={'query': ANIME_QUERY, 'variables': variables}).json()
     return data['data']['Media']
 
 
-def get_anime_embed(name):
+def create_anime_embed(name):
     # JSON dos dados do anime
     data = get_anime_data(name)
     # Embed base para adicionar os dados específicos de anime
-    embed = get_base_embed(data)
+    embed = create_base_embed(data)
     return embed
 
 
 def anime(name):
-    embed = get_anime_embed(name)
+    embed = create_anime_embed(name)
     return embed

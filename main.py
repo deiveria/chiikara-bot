@@ -1,12 +1,11 @@
 import discord
 import os
 import config
-from discord.ext import commands
 import logging
+import database
+from discord.ext import commands
 
-
-logging.basicConfig(level=logging.INFO)
-
+database.create_tables()
 client = commands.Bot(command_prefix=config.prefix)
 
 
