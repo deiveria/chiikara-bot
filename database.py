@@ -20,7 +20,7 @@ class LastMessage(BaseModel):
     guild = IntegerField()
     message = IntegerField(null=True)
     channel = IntegerField(null=True)
-    time = DateField(null=True)
+    timestamp = TimestampField(null=True)
 
 
 def create_tables():

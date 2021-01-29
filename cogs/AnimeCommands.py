@@ -12,11 +12,6 @@ class AnimeCommands(commands.Cog, name='Anime e Mangá'):
     async def anime(self, ctx, *, anime_name):
         await ctx.send(embed=anilist.anime(anime_name))
 
-    @anime.error
-    async def anime_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Você não enviou nenhum argumento.")
-
 
 def setup(bot):
     bot.add_cog(AnimeCommands(bot))

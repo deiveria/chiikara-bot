@@ -1,22 +1,32 @@
 import discord
-from datetime import datetime
+from datetime import datetime, timezone
 from database import *
 from discord.ext import commands
+
+
+# Converter o horário pro fuso do Brasil
+def utc_to_local(utc_dt):
+    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+
+
+# Criar um embed com as informações da última mensagem
+async def create_message_embed(message, timestamp):
+    # Convertendo o horário e formatando para uma String
+    time = utc_to_local(timestamp).strftime("%d/%m/%Y às %H:%M")
+
+    embed = discord.Embed(title=f'Última mensagem de {message.author.name}', colour=0x69DBEF)
+    embed.add_field(name='Conteúdo', value=message.content, inline=False)
+    embed.add_field(name='Horário', value=time)
+    embed.set_footer(text='A última mensagem do usuário só é registrada caso o bot esteja online!')
+    embed.set_thumbnail(url=message.author.avatar_url)
+
+    return embed
 
 
 class Message(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-
-
-    async def create_message_embed(self, message):
-        embed = discord.Embed(title=f'Última mensagem de {message.author.name}')
-        embed.add_field(name='Conteúdo', value=message.content, inline=False)
-        embed.add_field(name='Horário', value=message.created_at)
-        embed.set_footer(text='A última mensagem do usuário só é contada caso o bot esteja online!')
-        embed.set_thumbnail(url=message.author.avatar_url)
-        return embed
 
     # Esse evento é chamado em toda mensagem em um canal que o Bot pode ver
     @commands.Cog.listener()
@@ -36,7 +46,7 @@ class Message(commands.Cog):
         # Atualizando os dados.
         lm.channel = message.channel.id
         lm.message = message.id
-        lm.time = message.created_at
+        lm.timestamp = message.created_at.timestamp()
         lm.save()
 
     @commands.command(name='lm')
@@ -51,14 +61,9 @@ class Message(commands.Cog):
             # Fetch na mensagem dentro do canal
             message = await channel.fetch_message(lm.message)
             # Enviando o embed contendo a última mensagem
-            await ctx.send(embed=await self.create_message_embed(message))
+            await ctx.send(embed=await create_message_embed(message, lm.timestamp))
         except LastMessage.DoesNotExist:
             await ctx.send('Esse membro não tem mensagens no meu registro.')
-
-    @lm.error
-    async def lm_error(self, ctx, error):
-        if isinstance(error, commands.MemberNotFound):
-            await ctx.send('Não pude encontrar esse membro!')
 
 
 def setup(bot):
