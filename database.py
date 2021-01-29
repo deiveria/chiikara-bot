@@ -1,5 +1,3 @@
-from datetime import datetime
-from discord import channel
 from peewee import *
 
 # Arquivo da database vai ser bot.db, porque sim.
@@ -19,10 +17,10 @@ class User(BaseModel):
 
 class LastMessage(BaseModel):
     user = ForeignKeyField(User, backref='lastmessage')
-    guild = IntegerField(null=True)
+    guild = IntegerField()
     message = IntegerField(null=True)
     channel = IntegerField(null=True)
-    timestamp = TimestampField(null=True)
+    time = DateField(null=True)
 
 
 def create_tables():

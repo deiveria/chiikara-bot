@@ -1,3 +1,4 @@
+# TODO: Mude do requests para aiohttp
 import requests
 import discord
 

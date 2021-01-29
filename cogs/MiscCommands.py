@@ -11,8 +11,8 @@ class MiscCommands(commands.Cog, name='Diversos'):
     @commands.command(name='falar', aliases=['diga', 'say', 'fala', 'fale'])
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
-    async def falar(self, ctx, channel: discord.TextChannel, *, arg):
-        await channel.send(arg)
+    async def falar(self, ctx, channel: discord.TextChannel, *, text):
+        await channel.send(text)
 
     @falar.error
     async def falar_error(self, ctx, error):
@@ -35,6 +35,8 @@ class MiscCommands(commands.Cog, name='Diversos'):
 
     @avatar.error
     async def avatar_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("Você não marcou nenhum usuário.")
         if isinstance(error, commands.MemberNotFound):
             await ctx.send("Membro não encontrado.")
 
