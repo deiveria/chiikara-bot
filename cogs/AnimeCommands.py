@@ -1,4 +1,3 @@
-import discord
 import helpers.anilist as anilist
 from discord.ext import commands
 
