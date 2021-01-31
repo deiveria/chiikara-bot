@@ -20,9 +20,10 @@ class LastMessage(BaseModel):
     class Meta:
         primary_key = CompositeKey('user_id', 'guild')
 
+
 def create_tables():
     db.create_tables([LastMessage])
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     create_tables()
