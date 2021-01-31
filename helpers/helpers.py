@@ -7,7 +7,7 @@ def utc_to_local(utc_dt):
     return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
 
-def info_embed(text, level="sucess"):
+def info_embed(text, level="sucess", title=None):
 
     colours = {
         "sucess": 0x3FFC7E,
@@ -16,4 +16,4 @@ def info_embed(text, level="sucess"):
         "warning": 0xEFFA80,
     }
 
-    return Embed(description=text, colour=colours[level])
+    return Embed(title=title, description=text, colour=colours[level])
