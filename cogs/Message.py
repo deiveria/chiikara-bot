@@ -1,18 +1,13 @@
 import discord
-from datetime import datetime, timezone
+from helpers import helpers
 from database import *
 from discord.ext import commands
-
-
-# Converter o horário pro fuso do Brasil
-def utc_to_local(utc_dt):
-    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
 
 # Criar um embed com as informações da última mensagem
 async def create_message_embed(message, timestamp):
     # Convertendo o horário e formatando para uma String
-    time = utc_to_local(timestamp).strftime("%d/%m/%Y às %H:%M")
+    time = helpers.utc_to_local(timestamp).strftime("%d/%m/%Y às %H:%M")
 
     embed = discord.Embed(title=f'Última mensagem de {message.author.name}', colour=0x69DBEF)
     embed.add_field(name='Conteúdo', value=message.content, inline=False)
@@ -34,22 +29,23 @@ class Message(commands.Cog):
         # Com o contexto da mensagem é possível saber se ela foi o comando
         ctx = await self.bot.get_context(message)
         # Caso o autor da mensagem seja um bot ou a mensagem tenha sido um comando, ela será ignorada.
-        if (message.author.bot or ctx.valid or message.guild == None):
+        if message.author.bot or ctx.valid or message.guild is None:
             return
 
-        # Tentando criar o registro na database do usuário, senão só dando um get no mesmo
-        user, created = User.get_or_create(
-            id=message.author.id, username=message.author.name)
+        # Tentando criar o registro na database de mensagens, senão só dando um get no mesmo
         lm, created = LastMessage.get_or_create(
             user_id=message.author.id, guild=message.guild.id)
 
-        # Atualizando os dados.
-        lm.channel = message.channel.id
-        lm.message = message.id
-        lm.timestamp = message.created_at.timestamp()
-        lm.save()
+        # Logando só por motivos de Debug.
+        if (created):
+            s = f"Criado o registro do usuário '[{message.author.name}]' na guilda '[{message.guild.name}'"
+            print(s)
 
-    @commands.command(name='lm')
+        # Atualizando os dados.
+        query = lm.update(channel=message.channel.id, message=message.id, timestamp=message.created_at.timestamp())
+        query.execute()
+
+    @commands.command(name='lm', aliases=['last', 'msg', 'lmsg'])
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     async def lm(self, ctx, member: discord.Member):

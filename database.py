@@ -10,21 +10,18 @@ class BaseModel(Model):
         database = db
 
 
-class User(BaseModel):
-    id = IntegerField(primary_key=True)
-    username = TextField(null=True)
-
-
 class LastMessage(BaseModel):
-    user = ForeignKeyField(User, backref='lastmessage')
+    user_id = IntegerField()
     guild = IntegerField()
     message = IntegerField(null=True)
     channel = IntegerField(null=True)
     timestamp = TimestampField(null=True)
 
+    class Meta:
+        primary_key = CompositeKey('user_id', 'guild')
 
 def create_tables():
-    db.create_tables([User, LastMessage])
+    db.create_tables([LastMessage])
 
 
 if (__name__ == "__main__"):
