@@ -1,12 +1,9 @@
-import discord
 import os
 import config
 import database
 from discord.ext import commands
 
-# Criando tabelas na database
-# Obs, eu não sei se a database tá nos conformes
-# Mas se funciona, não vou mudar.
+# Criando tabelas no banco da dados
 database.create_tables()
 
 # Inicando o client usando o módulo de comandos

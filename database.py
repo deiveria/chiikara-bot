@@ -26,6 +26,7 @@ class LastMessage(BaseModel):
 class HiddenChannels(BaseModel):
     user_id = IntegerField()
     channel = IntegerField()
+    guild = IntegerField()
     self_hidden = BooleanField(default=True)
 
 

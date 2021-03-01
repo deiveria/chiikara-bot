@@ -38,7 +38,7 @@ class Message(commands.Cog):
 
         # Logando só por motivos de Debug.
         if created:
-            s = f"Criado o registro do usuário '[{message.author.name}]' na guilda '[{message.guild.name}'"
+            s = f"Criado o registro do usuário '{message.author.name}' na guilda '{message.guild.name}'"
             print(s)
 
         # Atualizando os dados.

@@ -15,7 +15,7 @@ class UtilCommands(commands.Cog, name='Utilidade'):
     @commands.guild_only()
     async def esconder(self, ctx, channel: discord.TextChannel):
         # Pegando o valor na database
-        hidden, created = HiddenChannels.get_or_create(user_id=ctx.author.id, channel=channel.id)
+        hidden, created = HiddenChannels.get_or_create(user_id=ctx.author.id, channel=channel.id, guild=ctx.guild.id)
         # Se o usuário já tiver escondido antes, o comando será cancelado.
         if not created:
             embed = info_embed("Desculpe, mas você já escondeu esse canal.", level="warning")
@@ -26,7 +26,7 @@ class UtilCommands(commands.Cog, name='Utilidade'):
         overwrite.update(send_messages=False, read_messages=False)
         # Setando os valores definidos
         await channel.set_permissions(ctx.author, overwrite=overwrite)
-
+        # Embed com o feedback para o usuário
         embed = info_embed(f'Prontinho, o canal **<#{channel.id}>** foi escondido pra você!')
         await ctx.channel.send(embed=embed)
 
@@ -36,7 +36,7 @@ class UtilCommands(commands.Cog, name='Utilidade'):
     @commands.guild_only()
     async def exibir(self, ctx, channel: discord.TextChannel):
         # Pegando o valor na database, porém aqui usando uma função que vai retornar None se não existir.
-        hidden = HiddenChannels.get_or_none(user_id=ctx.author.id, channel=channel.id)
+        hidden = HiddenChannels.get_or_none(user_id=ctx.author.id, channel=channel.id, guild=ctx.guild.id)
         # Se o valor for none, ou self_hidden for False, o comando não será executado.
         if hidden is None or not hidden.self_hidden:
             embed = info_embed("Desculpe, mas você não escondeu esse canal.", level="warning")
@@ -53,14 +53,13 @@ class UtilCommands(commands.Cog, name='Utilidade'):
         # Senão apenas esses dois.
         else:
             await channel.set_permissions(ctx.author, overwrite=overwrite)
-
+        # Embed com o feedback para o usuário
         embed = info_embed(f'Prontinho, o canal <#{channel.id}> foi exibido de volta pra você!')
         await ctx.channel.send(embed=embed)
 
     @esconder.error
     @exibir.error
     async def exibir_error(self, ctx, error):
-        print(error)
         if isinstance(error, commands.ChannelNotFound):
             embed = info_embed("Desculpe, não fui capaz de encontrar esse canal.", level="error")
             await ctx.send(embed=embed)
@@ -70,12 +69,18 @@ class UtilCommands(commands.Cog, name='Utilidade'):
     @commands.guild_only()
     async def hidden(self, ctx):
         # Selecionando da database todos os canais escondidos por esse usuário
-        query = HiddenChannels.select().where(HiddenChannels.user_id == ctx.author.id and HiddenChannels.self_hidden)
+        query = HiddenChannels.select().where(HiddenChannels.user_id == ctx.author.id,
+                                              HiddenChannels.guild == ctx.guild.id,
+                                              HiddenChannels.self_hidden)
+
         # Fazendo uma String com os canais, separados por uma ', '
         channels = ''.join(f'<#{hidden.channel}>, ' for hidden in query)
+        if channels == '':
+            return await ctx.send(embed=info_embed("Você não escondeu nenhum canal ainda.", level="warning"))
         # O channels[:-2] está removendo os últimos dois caracteres da String, pois na concatenação acima sobra uma ', '
         # no final.
         embed = info_embed(channels[:-2], level="info", title="Canais escondidos por você")
+        embed.set_footer(text="Para voltar a ver algum canal, use c!exibir")
         # Enviando o embed
         await ctx.send(embed=embed)
 
