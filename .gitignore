@@ -1,6 +1,8 @@
 # Coisas adicionadas por mim.
+config.py
 .vscode/
 bot.db
+.idea
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
