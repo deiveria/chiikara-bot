@@ -5,7 +5,7 @@ import database
 from discord.ext import commands
 
 # Checando se a token foi colocada.
-if config.token == "SUA TOKEN AQUI":
+if config.token == 'SUA TOKEN AQUI':
     sys.exit("Você não configurou sua token no config.py")
 
 # Criando tabelas no banco da dados
