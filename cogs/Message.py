@@ -33,8 +33,7 @@ class Message(commands.Cog):
             return
 
         # Tentando criar o registro na database de mensagens, senão só dando um get no mesmo
-        lm, created = LastMessage.get_or_create(
-            user_id=message.author.id, guild=message.guild.id)
+        lm, created = LastMessage.get_or_create(user_id=message.author.id, guild=message.guild.id)
 
         # Logando só por motivos de Debug.
         if created:
@@ -47,19 +46,34 @@ class Message(commands.Cog):
 
     @commands.command(name='lm', aliases=['last', 'msg', 'lmsg'])
     @commands.guild_only()
-    @commands.has_permissions(manage_messages=True)
     async def lm(self, ctx, member: discord.Member):
-        try:
-            # Select na database pelos dados da última mensagem
-            lm = LastMessage.get(user_id=member.id, guild=ctx.guild.id)
-            # Get no canal da mensagem
-            channel = ctx.guild.get_channel(lm.channel)
-            # Fetch na mensagem dentro do canal
-            message = await channel.fetch_message(lm.message)
-            # Enviando o embed contendo a última mensagem
-            await ctx.send(embed=await create_message_embed(message, lm.timestamp))
-        except LastMessage.DoesNotExist:
-            await ctx.send('Esse membro não tem mensagens no meu registro.')
+        # Select na database pelos dados da última mensagem
+        lm = LastMessage.get_or_none(user_id=member.id, guild=ctx.guild.id)
+
+        # get_or_none returna o registro do usuário caso ele existe, senão retorna None
+        if lm is None:
+            embed = helpers.info_embed('Esse membro não tem mensagens no meu registro.', level="error")
+            return await ctx.send(embed=embed)
+
+        # Get no canal da mensagem
+        channel = ctx.guild.get_channel(lm.channel)
+        # Fetch na mensagem dentro do canal
+        message = await channel.fetch_message(lm.message)
+        # Enviando o embed contendo a última mensagem
+        await ctx.send(embed=await create_message_embed(message, lm.timestamp))
+
+    @lm.error
+    async def lm_error(self, ctx, error):
+        # Acho que essa é a melhor aproximação, pois independente do erro, previsto ou não, vai avisar ao usuário.
+        embed = None
+
+        if isinstance(error, commands.MemberNotFound):
+            embed = helpers.info_embed('Não foi possível encontrar este membro.', level="error")
+
+        if embed is None:
+            embed = helpers.info_embed('Ocorreu um erro que eu não previa, hmm. Tente novamente.', level="error")
+
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

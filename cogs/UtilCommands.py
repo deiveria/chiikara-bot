@@ -65,7 +65,7 @@ class UtilCommands(commands.Cog, name='Utilidade'):
             await ctx.send(embed=embed)
 
     # Comando para mostrar os canais escondidos pelo usuário.
-    @commands.command(name='escondidos', aliases=['ocultos'])
+    @commands.command(name='escondidos', aliases=['ocultos', 'hidden'])
     @commands.guild_only()
     async def hidden(self, ctx):
         # Selecionando da database todos os canais escondidos por esse usuário
