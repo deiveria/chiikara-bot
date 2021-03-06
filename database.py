@@ -30,8 +30,14 @@ class HiddenChannels(BaseModel):
     self_hidden = BooleanField(default=True)
 
 
+class GuildConfig(BaseModel):
+    guild_id = IntegerField(primary_key=True)
+    bot_channel = IntegerField(null=True)
+    log_channel = IntegerField(null=True)
+
+
 def create_tables():
-    db.create_tables([LastMessage, HiddenChannels])
+    db.create_tables([LastMessage, HiddenChannels, GuildConfig])
 
 
 # Caso esse arquivo seja executado diretamente as tabelas serão criadas.

@@ -1,5 +1,4 @@
 from helpers.helpers import info_embed
-from config import prefix
 from difflib import get_close_matches
 from discord.ext import commands
 
@@ -31,14 +30,14 @@ class ErrorHandler(commands.Cog):
             # Caso ele encontre algum comando que seja próximo, será enviado ao usuário a dica
             if len(matches) > 0:
                 embed = info_embed(
-                    f'O comando "**{sent_cmd}**" não foi encontrado, você quis dizer "**{prefix}{matches[0]}**"?',
+                    f'O comando "**{sent_cmd}**" não foi encontrado, você quis dizer "**{matches[0]}**"?',
                     level='info'
                 )
                 await ctx.send(embed=embed)
             # Senão irá apenas avisar que não existe tal comando.
             else:
                 embed = info_embed(
-                    f'O comando"**{sent_cmd}**" não foi encontrado, use o comando `{prefix}ajuda` para saber mais.',
+                    f'O comando"**{sent_cmd}**" não foi encontrado, use o comando **"ajuda"** para saber mais.',
                     level='warning'
                 )
                 await ctx.send(embed=embed)
